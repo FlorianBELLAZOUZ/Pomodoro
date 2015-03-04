@@ -5,15 +5,220 @@
 	<style type="text/css">
 		body{
 			background-color: #CCC;	
-		}
-		h1{
 			color: #333;
 			text-align: center;
 			font-family: Arial, sans-serif;
+			-webkit-user-select:none;
+			cursor: default;
 		}
 	</style>
 </head>
 <body>
-	<h1>POMODORO</h1>
 </body>
+<script id="coucou" type="template">
+	<div class="pomodoro">
+		
+	</div>
+</script>
+<script id="menu" type="templates">
+	div.
+</script>
+<script type="text/javascript">
+	var _ = {
+		extend:function(obj1,obj2){
+			for(var p in obj2){
+				obj1[p] = obj2[p];
+			}
+		},
+		template:function(text,obj){
+			var keyWords = [];
+
+			var x = 0
+			while(text.search('{{') != -1 && x < 10){
+				x++;
+				// Extraire tout les mots entre {{}}
+				var pos = text.search('{{');
+				var keyWord = "";
+				var end = "";
+				while(end != "}}"){
+					var l = text[pos]
+					keyWord += l;
+					if(l == "}")
+						end += '}'
+					pos ++;
+				}
+				keyWord = keyWord.replace(/{/g,'');
+				keyWord = keyWord.replace(/}/g,'');
+
+				// remplacer {{}} par [[]]
+				text = text.replace('{{','<<');
+				text = text.replace('}}','>>');
+
+				keyWords.push(keyWord);
+			}
+
+			// Remplacer les mots entre {{}} par la clef de l'obj corespondante
+			var i = 0;
+			console.log("text",text);
+			while(text.search('<<') != -1){
+				var k = keyWords[i++];
+				var r = typeof obj[k] != 'undefined' ? obj[k]:''
+				text = text.replace('<<'+k+'>>',r);
+			}
+			
+			return text;					
+		}
+	};
+
+	var Class = function(){
+		this.init.apply(this,arguments);
+	}
+
+	Class.extend = function(obj){
+		var parent = this;
+		
+		var child = function(){
+			parent.apply(this,arguments);
+		}
+
+		child.prototype.init = function(){};
+
+		_.extend(child,this);
+		_.extend(child.prototype,this.prototype)
+
+		for(var a in obj){
+			if(typeof obj[a] == "function" && typeof parent.prototype[a] == "function"){
+				child.prototype[a] = (function(){
+					return function(){
+						this.parent = parent.prototype[a];
+						var re = obj[a].apply(this,arguments);
+						return re;
+					}
+				})();
+
+			}else{
+				child.prototype[a] = obj[a];
+			}
+		}
+
+		return child;
+	}
+
+	// Input
+	document.addEventListener('touchstart',touchStart);
+	document.addEventListener('touchmove',touchMove);
+
+	document.addEventListener('mousedown',mouseDown);
+	document.addEventListener('mousemove',mouseMove);
+
+	var x;
+
+	function touchStart(evt){
+		x = evt.touches[0].clientX;   
+	}
+
+	function touchMove(evt){
+		if (!x) return;
+		xUp = evt.touches[0].clientX;
+
+		xDiff = x - xUp;
+
+		if(xDiff > 0 ){
+			document.dispatchEvent( new Event('swipeleft'));
+		}else{
+			document.dispatchEvent( new Event('swiperight'));
+		}
+	}
+
+	function mouseDown(evt){
+		x = evt.clientX;   
+	}
+
+	function mouseMove(evt){
+		if (!x) return;
+		xUp = evt.clientX;
+
+		xDiff = x - xUp;
+
+		if(xDiff > 0 ){
+			document.dispatchEvent( new Event('swipeleft'));
+		}else{
+			document.dispatchEvent( new Event('swiperight'));
+		}
+	}
+
+	// Real
+	var Real = Class.extend({
+		init:function(){
+			this.changeEcran(Acceuil);
+
+			this.initInput();
+		},
+		changeEcran:function(ec){
+			console.log("== Change Ecran ==");
+
+			var e = new ec();
+		},
+		initInput:function(){
+			document.addEventListener('swiperight',function(){
+				
+				console.log("swiperight");
+				document.body.innerHTML += "<br> swipeRight";
+			});
+		}
+	});
+
+	// --------
+	// Ecran
+	// --------
+	
+	// Dom element
+	var Dom       = Class.extend({
+		el:"div",
+		className:"",
+		init:function(tag){
+			var tag = tag || 'body'
+			var parent = document.getElementsByTagName(tag)[0];
+			var el = document.createElement('div');
+			el.className = this.className;
+
+			parent.appendChild(el);
+
+			var rendu = this.render();
+			el.innerHTML = rendu;
+		},
+		render:function(){
+			return "hello Word";
+		}
+	})
+
+	// Ecran
+	var Ecran     = Dom.extend({
+		
+	});
+
+	// Acceuil
+	var Acceuil   = Ecran.extend({
+		render:function(){
+			return "Acceuil";
+		}
+	});
+
+	// Stats
+	var Stats     = Ecran.extend({
+		render:function(){
+			return "Stats";
+		}
+	});
+
+	// Historique
+	var Historique = Ecran.extend({
+		render:function(){
+			return "Historique";
+		}
+	});
+
+	var real = new Real();
+
+</script>
 </html>
