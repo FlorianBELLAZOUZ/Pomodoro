@@ -108,9 +108,6 @@
 	document.addEventListener('touchstart',touchStart);
 	document.addEventListener('touchmove',touchMove);
 
-	document.addEventListener('mousedown',mouseDown);
-	document.addEventListener('mousemove',mouseMove);
-
 	var x;
 
 	function touchStart(evt){
@@ -120,23 +117,6 @@
 	function touchMove(evt){
 		if (!x) return;
 		xUp = evt.touches[0].clientX;
-
-		xDiff = x - xUp;
-
-		if(xDiff > 0 ){
-			document.dispatchEvent( new Event('swipeleft'));
-		}else{
-			document.dispatchEvent( new Event('swiperight'));
-		}
-	}
-
-	function mouseDown(evt){
-		x = evt.clientX;   
-	}
-
-	function mouseMove(evt){
-		if (!x) return;
-		xUp = evt.clientX;
 
 		xDiff = x - xUp;
 
@@ -164,6 +144,11 @@
 				
 				console.log("swiperight");
 				document.body.innerHTML += "<br> swipeRight";
+			});
+			document.addEventListener('swipeleft',function(){
+				
+				console.log("swiperight");
+				document.body.innerHTML += "<br> swipeLeft";
 			});
 		}
 	});
