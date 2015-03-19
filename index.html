@@ -11,6 +11,12 @@
 			top: 0;
 			bottom: 0;
 		}
+		.width{
+			width: 100%;
+		}
+		.height{
+			height: 100%;
+		}
 	</style>
 </head>
 <body>
@@ -50,8 +56,24 @@ function Game(){
 
 	this.start();
 
-	console.log("Lance l'update");
 	setInterval(this.update.bind(this),100);
+
+	window.onresize = this.resize.bind(this);
+	this.resize();
+}
+
+Game.prototype.resize = function(){
+	console.log("resize");
+	var w = window.innerWidth;
+	var h = window.innerHeight;
+
+	var c = document.getElementsByTagName('canvas')[0];
+
+	if(w<h){
+		c.className = "width";
+	}else{
+		c.className = "height";
+	}
 }
 
 Game.prototype.start = function(){
